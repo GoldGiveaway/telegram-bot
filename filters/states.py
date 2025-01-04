@@ -9,5 +9,8 @@ class GiveawayCreate(StatesGroup):
 class ChatShared(StatesGroup):
     chat = State()
 
+class GiveawayEdit(StatesGroup):
+    data = State()
+
 NoneState = StateFilter(None)
 AnyState = ~NoneState
