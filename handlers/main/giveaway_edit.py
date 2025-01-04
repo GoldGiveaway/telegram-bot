@@ -4,14 +4,14 @@ from aiogram.fsm.context import FSMContext
 from filters.states import ChatShared
 from keyboards import for_giveaway_edit, for_index
 from services import date, db
-from services.giveaway_text import generate_giveaway_text
-
+from services.giveaway_text import generate_giveaway_text, generate_image_url
+from settings import Settings
 
 router = Router(name=__name__)
 
 async def open_giveaway(message: Message, giveaway_db: dict):
     await message.answer_photo(
-        photo='https://i.imgur.com/FRYuxCD.png',
+        photo=generate_image_url(giveaway_db),
         caption=generate_giveaway_text(giveaway_db),
         reply_markup=for_giveaway_edit.giveaway_edit(giveaway_db['giveaway_id'])
     )

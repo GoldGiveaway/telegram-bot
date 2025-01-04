@@ -1,4 +1,10 @@
+import time
+
 from services import date
+from settings import Settings
+import urllib.parse
+
+settings = Settings()
 
 def generate_giveaway_text(data: dict) -> str:
     text = f'<b>{data["title"]}</b>'
@@ -13,3 +19,14 @@ def generate_giveaway_text(data: dict) -> str:
              "</blockquote>"
 
     return text
+
+
+def generate_image_url(data: dict) -> str:
+    data = {
+        'title': data['title'],
+        'end': 'Завтра',
+        'wins': data['win_count'],
+        'users': len(data['members']),
+        'time': str(time.time())
+    }
+    return f'{settings.server_image}/generate?{urllib.parse.urlencode(data)}'
