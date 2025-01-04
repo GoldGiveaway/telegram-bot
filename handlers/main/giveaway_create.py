@@ -63,5 +63,6 @@ async def _(message: Message, state: FSMContext):
     await db.create_giveaway(
         title=data['title'],
         date_end=date_end,
+        owner_id=message.from_user.id,
     )
     await message.answer('<b>🎁 Розыгрыш успешно создан!</b>')

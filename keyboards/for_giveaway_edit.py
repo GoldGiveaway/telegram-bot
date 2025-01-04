@@ -1,0 +1,71 @@
+import time
+
+import aiogram.types as types
+from aiogram.utils.keyboard import InlineKeyboardMarkup, ReplyKeyboardMarkup
+
+
+def giveaway_edit(giveaway_id: str) -> InlineKeyboardMarkup:
+    buttons = [
+        [
+            types.InlineKeyboardButton(text="Каналы 📢", callback_data=f"gedit|channel|{giveaway_id}"),
+        ],
+        [
+            types.InlineKeyboardButton(text="Ред. название 💬", callback_data="asd"),
+            types.InlineKeyboardButton(text="Ред. дату завершения 📅", callback_data="asd"),
+        ],
+        [
+            types.InlineKeyboardButton(text="Ред. описание 📝", callback_data="asd"),
+            types.InlineKeyboardButton(text="Ред. призовых мест 🫂", callback_data="asd"),
+        ],
+        [types.InlineKeyboardButton(text="✅ Опубликовать розыгрыш ✅", callback_data="asd")],
+    ]
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+def add_channel():
+    return ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[
+        types.KeyboardButton(
+            text='Выбрать канал',
+            request_chat=types.KeyboardButtonRequestChat(
+                request_title=True,
+                request_username=True,
+                request_photo=True,
+                request_id=1,
+                chat_is_channel=True,
+                user_administrator_rights=types.chat_administrator_rights.ChatAdministratorRights(
+                    **{arg: False for arg in [
+                        'is_anonymous',
+                        'can_manage_video_chats',
+                        'can_post_stories',
+                        'can_edit_stories',
+                        'can_delete_stories',
+                        'can_promote_members',
+                        'can_change_info',
+                        'can_manage_chat',
+                        'can_restrict_members',
+                    ]},
+                    can_invite_users=True,
+                    can_post_messages=True,
+                    can_delete_messages=True,
+                    can_edit_messages=True,
+                ),
+                bot_administrator_rights=types.chat_administrator_rights.ChatAdministratorRights(
+                    **{arg: False for arg in [
+                        'is_anonymous',
+                        'can_manage_chat',
+                        'can_manage_video_chats',
+                        'can_restrict_members',
+                        'can_promote_members',
+                        'can_change_info',
+                        'can_post_stories',
+                        'can_edit_stories',
+                        'can_delete_stories',
+                    ]},
+                    can_invite_users=True,
+                    can_post_messages=True,
+                    can_delete_messages=True,
+                    can_edit_messages=True,
+                ),
+            )
+        )
+    ]])

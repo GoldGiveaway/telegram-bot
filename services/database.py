@@ -1,3 +1,5 @@
+import uuid
+
 import motor.motor_asyncio
 from settings import Settings
 from redis.asyncio import Redis
@@ -44,18 +46,31 @@ class Database:
 
         return await self.users_collection.find_one({'user_id': user_id})
 
-    async def create_giveaway(self, title: str, date_end: date.datetime):
+    async def create_giveaway(self, title: str, date_end: date.datetime, owner_id: int):
         data = {
+            'giveaway_id': str(uuid.uuid4()),
             'created_at': date.now_datetime(),
             'end_et': date_end,
             'title': title,
+            'owner_id': owner_id,
             'description': '',
             'win_count': 1,
-            # 'channels': [{'id': 123, 'message_id': 123, 'link': 'https://t.me/....', 'name': 'Супер канал'}],
-            'channels': []
+            # 'channels': [{'id': 123, 'message_id': 123, 'link': 'https://t.me/....', 'name': 'Супер канал', 'photo': ''}],
+            'channels': [],
+            # 'members': [{'id': 123, 'date': DATE}]
+            'members': [],
         }
 
         await self.giveaways_collection.insert_one(data)
         return data
+
+    async def get_giveaway(self, giveaway_id: str) -> dict:
+        return await self.giveaways_collection.find_one({'giveaway_id': giveaway_id})
+
+    async def update_giveaway(self, giveaway_id: str, js: dict):
+        await self.giveaways_collection.update_one({'giveaway_id': giveaway_id}, {'$set': js})
+
+    async def get_all_giveaways_user(self, user_id: int) -> list:
+        return [item async for item in self.giveaways_collection.find({'owner_id': user_id})]
 
 db = Database(settings.mongodb_url.get_secret_value())
