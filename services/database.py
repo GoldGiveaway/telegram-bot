@@ -2,6 +2,7 @@ import motor.motor_asyncio
 from settings import Settings
 from redis.asyncio import Redis
 import time
+from services import date
 
 settings = Settings()
 redis = Redis(
@@ -15,6 +16,7 @@ class Database:
         self.cluster = motor.motor_asyncio.AsyncIOMotorClient(url_connect).cluster.TelegramBot
 
         self.users_collection = self.cluster.user
+        self.giveaways_collection = self.cluster.giveaway
 
     async def create_user(self, user_id: int) -> dict:
         """
@@ -26,7 +28,7 @@ class Database:
 
         data = {
             'user_id': user_id,
-            'created_at': time.time(),
+            'created_at': date.now_datetime(),
         }
 
         await self.users_collection.insert_one(data)
@@ -41,5 +43,19 @@ class Database:
         """
 
         return await self.users_collection.find_one({'user_id': user_id})
+
+    async def create_giveaway(self, title: str, date_end: date.datetime):
+        data = {
+            'created_at': date.now_datetime(),
+            'end_et': date_end,
+            'title': title,
+            'description': '',
+            'win_count': 1,
+            # 'channels': [{'id': 123, 'message_id': 123, 'link': 'https://t.me/....', 'name': 'Супер канал'}],
+            'channels': []
+        }
+
+        await self.giveaways_collection.insert_one(data)
+        return data
 
 db = Database(settings.mongodb_url.get_secret_value())

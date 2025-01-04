@@ -5,6 +5,7 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 from services import redis
+from handlers import main
 import ujson
 from settings import Settings
 from middlewares import UserDBMiddleware
@@ -17,7 +18,7 @@ def create_dispatcher() -> Dispatcher:
         redis=redis,
     )
     dp["settings"] = Settings()
-
+    dp.include_routers(main.router)
     dp.update.outer_middleware(UserDBMiddleware())
 
     dp.callback_query.middleware(CallbackAnswerMiddleware())
