@@ -1,6 +1,7 @@
-from handlers.main.menu import router as index_router
+from handlers.main import router as main_router
+from handlers.giveaway import router as giveaway_router
 
 routers = (
-    index_router
+    main_router,
+    giveaway_router
 )
-

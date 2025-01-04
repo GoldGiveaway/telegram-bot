@@ -15,16 +15,19 @@ def generate_giveaway_text(data: dict) -> str:
     text += "\n\n<blockquote>" \
                  f"Участников: <b>{len(data['members'])}</b>\n" \
                  f"Призовых мест: <b>{data['win_count']}</b>\n" \
-                 f"Дата завершения: <b>{date.date_to_string(data['end_et'])}</b>\n" \
+                 f"Дата завершения: <b>{date.date_to_string(data['end_et'])} по МСК</b>\n" \
              "</blockquote>"
 
     return text
 
 
 def generate_image_url(data: dict) -> str:
+    # TODO: Фиксануть генерацию даты
+    difference = data['end_et'] - date.datetime.now()
+    end_text = f'{difference.days} д.'
     data = {
         'title': data['title'],
-        'end': 'Завтра',
+        'end': end_text,
         'wins': data['win_count'],
         'users': len(data['members']),
         'time': str(time.time())
