@@ -4,7 +4,7 @@ import aiogram.types as types
 from aiogram.utils.keyboard import InlineKeyboardMarkup, ReplyKeyboardMarkup
 
 
-def giveaway_edit(giveaway_id: str) -> InlineKeyboardMarkup:
+def giveaway_edit(giveaway_id: str, status: str) -> InlineKeyboardMarkup:
     buttons = [
         [
             types.InlineKeyboardButton(text="Каналы 📢", callback_data=f"gedit|channel|{giveaway_id}"),
@@ -16,9 +16,16 @@ def giveaway_edit(giveaway_id: str) -> InlineKeyboardMarkup:
         [
             types.InlineKeyboardButton(text="Ред. описание 📝", callback_data=f"gedit|description|{giveaway_id}"),
             types.InlineKeyboardButton(text="Ред. призовых мест 🫂", callback_data=f"gedit|win|{giveaway_id}"),
-        ],
-        [types.InlineKeyboardButton(text="✅ Опубликовать розыгрыш ✅", callback_data=f"gedit|publish|{giveaway_id}")],
+        ]
     ]
+
+    if status == 'wait':
+        buttons.append([types.InlineKeyboardButton(text="✅ Опубликовать розыгрыш ✅", callback_data=f"gedit|publish|{giveaway_id}")])
+    elif status == 'active':
+        buttons.append([
+            types.InlineKeyboardButton(text="⌛️ Завершить розыгрыш", callback_data=f"asd"),
+            types.InlineKeyboardButton(text="❌ Удалить", callback_data=f"asd")
+        ])
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 

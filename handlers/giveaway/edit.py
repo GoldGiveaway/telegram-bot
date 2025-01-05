@@ -13,7 +13,7 @@ async def open_giveaway(message: Message, giveaway_db: dict):
     await message.answer_photo(
         photo=generate_image_url(giveaway_db),
         caption=generate_giveaway_text(giveaway_db),
-        reply_markup=for_giveaway_edit.giveaway_edit(giveaway_db['giveaway_id'])
+        reply_markup=for_giveaway_edit.giveaway_edit(giveaway_db['giveaway_id'], giveaway_db['status']),
     )
 
 async def send_giveaway(channel_id: int, giveaway_db: dict, bot: Bot) -> int:
