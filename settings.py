@@ -11,6 +11,7 @@ class Settings(YAMLSettings):
     redis_db: int
 
     server_image: str
+    celery_broker: SecretStr
 
     model_config = YAMLSettingsConfig(env_file_encoding="utf-8", yaml_file=("config.yml",))
 

@@ -4,9 +4,8 @@ from aiogram.fsm.context import FSMContext
 from filters.states import ChatShared, GiveawayEdit
 from keyboards import for_giveaway_edit, for_index
 from services import date, db
-from services.giveaway_text import generate_giveaway_text, generate_image_url
+from services.giveaway_text import generate_giveaway_text, generate_image_url, generate_button_link
 from datetime import timedelta
-import base64
 
 router = Router(name=__name__)
 
@@ -34,17 +33,16 @@ async def _(callback: CallbackQuery, state: FSMContext, bot: Bot):
     channels = []
 
     for channel in giveaway_db['channels']:
-        data = base64.b64encode(f"{giveaway_id}|{channel['id']}".encode('utf-8')).decode('utf-8')
         msg = await bot.send_photo(
             chat_id=channel['id'],
             photo=generate_image_url(giveaway_db),
             caption=generate_giveaway_text(giveaway_db),
-            reply_markup=for_giveaway_edit.giveaway_publish(f'https://t.me/{bot_me.username}/app?startapp={data}')
+            reply_markup=for_giveaway_edit.giveaway_publish(generate_button_link(bot_me.username, giveaway_id, channel['id']))
         )
         channel['message_id'] = msg.message_id
         channels.append(channel)
 
-    await db.update_giveaway(giveaway_id, {'channels': channels})
+    await db.update_giveaway(giveaway_id, {'channels': channels, 'last_message_update': None})
     await callback.message.reply('Успешно!')
 
 @router.callback_query(F.data.startswith("gedit|channel|"))

@@ -4,7 +4,9 @@ from factory import create_dispatcher, create_bot
 from typing import cast
 from settings import Settings
 import grpc
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import gRPC
+from services import sheduler
 
 logging.basicConfig(level=logging.INFO)
 
@@ -23,6 +25,10 @@ async def run_bot():
 
     bot_task = dp.start_polling(bot)
     grpc_task = run_grpc_server()
+
+    scheduler_model = AsyncIOScheduler()
+    scheduler_model.add_job(sheduler.update, 'interval', seconds=10, args=(bot, ))
+    scheduler_model.start()
 
     return await asyncio.gather(bot_task, grpc_task)
 

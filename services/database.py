@@ -3,7 +3,7 @@ import uuid
 import motor.motor_asyncio
 from settings import Settings
 from redis.asyncio import Redis
-import time
+from datetime import timedelta
 from services import date
 
 settings = Settings()
@@ -62,7 +62,8 @@ class Database:
             'channels': [],
             # 'members': [{'id': 123, 'date': DATE}]
             'members': [],
-            'last_message_update': None
+            'last_message_update': False,
+            'status': 'active'
         }
 
         await self.giveaways_collection.insert_one(data)
@@ -77,6 +78,15 @@ class Database:
     async def get_all_giveaways_user(self, user_id: int) -> list:
         return [item async for item in self.giveaways_collection.find({'owner_id': user_id})]
 
+    async def get_all_update_giveaways(self):
+        return [item async for item in self.giveaways_collection.find({
+            '$or': [
+                {'last_message_update': None},
+                {'last_message_update': {'$lt': date.now_datetime() - timedelta(hours=5)}},
+            ],
+            'status': 'active'
+        })]
+
     async def giveaway_participating(self, user_id: int, giveaway_id: str) -> bool:
         giveaway_db = await self.get_giveaway(giveaway_id)
         if user_id in [member['id'] for member in giveaway_db['members']]:
@@ -86,6 +96,7 @@ class Database:
             'date': date.now_datetime(),
         })
         await self.update_giveaway(giveaway_id, giveaway_db)
+        await db.update_giveaway(giveaway_id, {'last_message_update': None})
         return True
 
 db = Database(settings.mongodb_url.get_secret_value())
