@@ -38,7 +38,7 @@ async def _(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(ChatShared.chat, F.chat_shared)
-async def _(message: Message, state: FSMContext):
+async def _(message: Message, state: FSMContext, bot: Bot):
     data = await state.get_data()
     giveaway_db = await db.get_giveaway(data['giveaway_id'])
     await state.clear()
@@ -50,7 +50,8 @@ async def _(message: Message, state: FSMContext):
         photo_id = None
         if channel.photo:
             photo_id = channel.photo[0].file_id
-        giveaway_db['channels'].append({'id': channel.chat_id, 'message_id': None, 'link': None, 'name': channel.title, 'photo': photo_id})
+        link = await bot.create_chat_invite_link(channel.chat_id)
+        giveaway_db['channels'].append({'id': channel.chat_id, 'message_id': None, 'link': link.invite_link, 'name': channel.title, 'photo': photo_id})
         await db.update_giveaway(giveaway_db['giveaway_id'], giveaway_db)
 
         await message.answer('<b>Канал успешно добавлен!</b>', reply_markup=for_index.clear_keyboard())
