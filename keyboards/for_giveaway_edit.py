@@ -1,5 +1,4 @@
-import time
-
+import urllib.parse
 import aiogram.types as types
 from aiogram.utils.keyboard import InlineKeyboardMarkup, ReplyKeyboardMarkup
 
@@ -30,8 +29,11 @@ def giveaway_edit(giveaway_id: str, status: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 def giveaway_publish(link: str) -> InlineKeyboardMarkup:
+    share_data = {'url': link, 'text': '\nУчаствуй в розыгрыше!'}
     buttons = [
         [types.InlineKeyboardButton(text="✅ Участвовать", url=link)],
+        [types.InlineKeyboardButton(text="🔗 Поделиться",
+                                    url=f'https://t.me/share/url?{urllib.parse.urlencode(share_data)}')]
     ]
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
