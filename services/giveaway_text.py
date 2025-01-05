@@ -22,7 +22,6 @@ def generate_giveaway_text(data: dict) -> str:
 
 
 def generate_image_url(data: dict) -> str:
-    return 'https://i.imgur.com/FRYuxCD.png'
     # TODO: Фиксануть генерацию даты
     difference = data['end_et'] - date.datetime.now()
     end_text = f'{difference.days} д.'
@@ -31,7 +30,7 @@ def generate_image_url(data: dict) -> str:
         'end': end_text,
         'wins': data['win_count'],
         'users': len(data['members']),
-        'time': str(time.time())
+        'time': int(time.time())
     }
     return f'{settings.server_image}/generate?{urllib.parse.urlencode(data)}'
 

@@ -62,8 +62,9 @@ class Database:
             'channels': [],
             # 'members': [{'id': 123, 'date': DATE}]
             'members': [],
-            'last_message_update': False,
-            'status': 'active'
+            'last_message_update': None,
+            # active / wait / finalized
+            'status': 'wait'
         }
 
         await self.giveaways_collection.insert_one(data)

@@ -16,6 +16,17 @@ async def open_giveaway(message: Message, giveaway_db: dict):
         reply_markup=for_giveaway_edit.giveaway_edit(giveaway_db['giveaway_id'])
     )
 
+async def send_giveaway(channel_id: int, giveaway_db: dict, bot: Bot) -> int:
+    bot_me = await bot.get_me()
+    msg = await bot.send_photo(
+        chat_id=channel_id,
+        photo=generate_image_url(giveaway_db),
+        caption=generate_giveaway_text(giveaway_db),
+        reply_markup=for_giveaway_edit.giveaway_publish(
+            generate_button_link(bot_me.username, giveaway_db['giveaway_id'], channel_id))
+    )
+    return msg.message_id
+
 @router.callback_query(F.data.startswith("giveaway|edit|"))
 async def _(callback: CallbackQuery, state: FSMContext):
     giveaway_id = callback.data.split("|")[2]
@@ -23,6 +34,20 @@ async def _(callback: CallbackQuery, state: FSMContext):
 
     await callback.message.delete()
     await open_giveaway(callback.message, giveaway_db)
+
+@router.callback_query(F.data.startswith("resend|"))
+async def _(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    _, giveaway_id, channel_id = callback.data.split("|")
+    giveaway_db = await db.get_giveaway(giveaway_id)
+
+    msg_id = await send_giveaway(int(channel_id), giveaway_db, bot)
+    for channel in giveaway_db['channels']:
+        if channel['id'] == channel_id:
+            channel['message_id'] = msg_id
+            break
+    await db.update_giveaway(giveaway_id, {'channels': giveaway_db['channels']})
+    await callback.message.reply('Опубликовано!')
+
 
 @router.callback_query(F.data.startswith("gedit|publish|"))
 async def _(callback: CallbackQuery, state: FSMContext, bot: Bot):
@@ -33,16 +58,14 @@ async def _(callback: CallbackQuery, state: FSMContext, bot: Bot):
     channels = []
 
     for channel in giveaway_db['channels']:
-        msg = await bot.send_photo(
-            chat_id=channel['id'],
-            photo=generate_image_url(giveaway_db),
-            caption=generate_giveaway_text(giveaway_db),
-            reply_markup=for_giveaway_edit.giveaway_publish(generate_button_link(bot_me.username, giveaway_id, channel['id']))
+        channel['message_id'] = await send_giveaway(
+            channel['id'],
+            giveaway_db,
+            bot
         )
-        channel['message_id'] = msg.message_id
         channels.append(channel)
 
-    await db.update_giveaway(giveaway_id, {'channels': channels, 'last_message_update': None})
+    await db.update_giveaway(giveaway_id, {'channels': channels, 'last_message_update': None, 'status': 'active'})
     await callback.message.reply('Успешно!')
 
 @router.callback_query(F.data.startswith("gedit|channel|"))
@@ -156,7 +179,7 @@ async def _(message: Message, state: FSMContext, bot: Bot):
                 return
             giveaway_db['end_et'] = date_end
         case _: return
-
+    giveaway_db['last_message_update'] = None
     await db.update_giveaway(giveaway_db['giveaway_id'], giveaway_db)
     await bot.delete_message(
         chat_id=message.chat.id,

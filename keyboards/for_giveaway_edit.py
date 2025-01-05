@@ -29,6 +29,13 @@ def giveaway_publish(link: str) -> InlineKeyboardMarkup:
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
+def giveaway_channel_send(giveaway_id: str, channel_id: int) -> InlineKeyboardMarkup:
+    buttons = [
+        [types.InlineKeyboardButton(text="Отправить новое сообщение", callback_data=f'resend|{giveaway_id}|{channel_id}')],
+    ]
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
 def add_channel():
     return ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[
         types.KeyboardButton(

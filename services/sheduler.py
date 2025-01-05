@@ -3,7 +3,7 @@ import traceback
 from aiogram import Bot, exceptions
 from aiogram.types import InputMediaPhoto
 from services import db, giveaway_text, date
-from keyboards.for_giveaway_edit import giveaway_publish
+from keyboards import for_giveaway_edit
 import logging
 
 async def update(bot: Bot):
@@ -11,19 +11,28 @@ async def update(bot: Bot):
 
     for giveaway in await db.get_all_update_giveaways():
         logging.info(f'Update message {giveaway["giveaway_id"]}')
+        url_media = giveaway_text.generate_image_url(giveaway)
         for channel in giveaway['channels']:
             try:
                 await bot.edit_message_media(
                     chat_id=channel['id'],
                     message_id=channel['message_id'],
-                    media=InputMediaPhoto(media=giveaway_text.generate_image_url(giveaway),
+                    media=InputMediaPhoto(media=url_media,
                                           caption=giveaway_text.generate_giveaway_text(giveaway)),
-                    reply_markup=giveaway_publish(giveaway_text.generate_button_link(bot_me.username, giveaway['giveaway_id'], channel['id']))
+                    reply_markup=for_giveaway_edit.giveaway_publish(giveaway_text.generate_button_link(bot_me.username, giveaway['giveaway_id'], channel['id']))
                 )
             except exceptions.TelegramBadRequest as e:
-                if 'message is not modified' in str(e):
-                    pass
-            except exceptions.TelegramForbiddenError:
+                if 'MESSAGE_ID_INVALID' in str(e):
+                    try:
+                        await bot.send_message(
+                            chat_id=giveaway['owner_id'],
+                            text=f'<b>⚠️ КРИТИЧЕСКАЯ ОШИБКА:</b> Сообщение с розыгрышем было удалено с канала <b>{channel["name"]}</b>\n\n' \
+                                 'Нажмите на кнопку ниже что-бы отправить его снова',
+                            reply_markup=for_giveaway_edit.giveaway_channel_send(giveaway['giveaway_id'], channel['id'])
+                        )
+                    except:
+                        pass
+            except exceptions.TelegramForbiddenError as e:
                 try:
                     await bot.send_message(
                         chat_id=giveaway['owner_id'],
