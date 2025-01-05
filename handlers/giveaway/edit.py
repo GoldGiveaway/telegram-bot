@@ -99,6 +99,7 @@ async def _(message: Message, state: FSMContext, bot: Bot):
     await open_giveaway(message, giveaway_db)
 
 
+
 @router.callback_query(F.data.startswith("gedit|"))
 async def _(callback: CallbackQuery, state: FSMContext):
     giveaway_id = callback.data.split("|")[2]
@@ -138,7 +139,6 @@ async def _(callback: CallbackQuery, state: FSMContext):
 async def _(message: Message, state: FSMContext, bot: Bot):
     data = await state.get_data()
     giveaway_db = await db.get_giveaway(data['giveaway_id'])
-    await state.clear()
 
     # TODO: Сделать нормально
     match data['type']:
@@ -178,6 +178,8 @@ async def _(message: Message, state: FSMContext, bot: Bot):
                 return
             giveaway_db['end_et'] = date_end
         case _: return
+
+    await state.clear()
     giveaway_db['last_message_update'] = None
     await db.update_giveaway(giveaway_db['giveaway_id'], giveaway_db)
     await bot.delete_message(
