@@ -54,7 +54,6 @@ async def _(callback: CallbackQuery, state: FSMContext, bot: Bot):
     giveaway_id = callback.data.split("|")[2]
     giveaway_db = await db.get_giveaway(giveaway_id)
 
-    bot_me = await bot.get_me()
     channels = []
 
     for channel in giveaway_db['channels']:
