@@ -15,6 +15,6 @@ class UserDBMiddleware(BaseMiddleware):
         if user:
             db_user = await db.get_user(user.id)
             if not db_user:
-                db_user = await db.create_user(user.id)
+                db_user = await db.create_user(user.id, user.username, user.first_name, user.last_name)
             data["db_user"] = db_user
         return await handler(event, data)

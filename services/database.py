@@ -20,7 +20,7 @@ class Database:
         self.users_collection = self.cluster.user
         self.giveaways_collection = self.cluster.giveaway
 
-    async def create_user(self, user_id: int) -> dict:
+    async def create_user(self, user_id: int, username: str, first_name: str, last_name: str) -> dict:
         """
         Create a new user
 
@@ -31,6 +31,9 @@ class Database:
         data = {
             'user_id': user_id,
             'created_at': date.now_datetime(),
+            'username': username,
+            'last_name': last_name,
+            'first_name': first_name,
         }
 
         await self.users_collection.insert_one(data)
@@ -72,5 +75,16 @@ class Database:
 
     async def get_all_giveaways_user(self, user_id: int) -> list:
         return [item async for item in self.giveaways_collection.find({'owner_id': user_id})]
+
+    async def giveaway_participating(self, user_id: int, giveaway_id: str) -> bool:
+        giveaway_db = await self.get_giveaway(giveaway_id)
+        if user_id in [member['id'] for member in giveaway_db['members']]:
+            return False
+        giveaway_db['members'].append({
+            'id': user_id,
+            'date': date.now_datetime(),
+        })
+        await self.update_giveaway(giveaway_id, giveaway_db)
+        return True
 
 db = Database(settings.mongodb_url.get_secret_value())

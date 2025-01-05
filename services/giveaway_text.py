@@ -22,6 +22,7 @@ def generate_giveaway_text(data: dict) -> str:
 
 
 def generate_image_url(data: dict) -> str:
+    return 'https://i.imgur.com/FRYuxCD.png'
     # TODO: Фиксануть генерацию даты
     difference = data['end_et'] - date.datetime.now()
     end_text = f'{difference.days} д.'
