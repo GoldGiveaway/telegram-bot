@@ -19,9 +19,9 @@ class Greeter(giveaway_pb2_grpc.GreeterServicer):
         initData = json.loads(request.initData)
         user = json.loads(initData['user'])
 
-        db_user = await db.get_user(user['id'])
+        db_user = await db.get_user(int(user['id']))
         if not db_user:
-            await db.create_user(user['id'], user['username'], user['first_name'], user['last_name'])
+            await db.create_user(int(user['id']), user['username'], user['first_name'], user['last_name'])
 
         giveaway_id, chat_id = base64.b64decode(initData['start_param']).decode('utf-8').split('|', 2)
         result = await db.giveaway_participating(user['id'], giveaway_id)
