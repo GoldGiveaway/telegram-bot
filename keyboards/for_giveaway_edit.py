@@ -17,7 +17,14 @@ def giveaway_edit(giveaway_id: str) -> InlineKeyboardMarkup:
             types.InlineKeyboardButton(text="Ред. описание 📝", callback_data=f"gedit|description|{giveaway_id}"),
             types.InlineKeyboardButton(text="Ред. призовых мест 🫂", callback_data=f"gedit|win|{giveaway_id}"),
         ],
-        [types.InlineKeyboardButton(text="✅ Опубликовать розыгрыш ✅", callback_data="asd")],
+        [types.InlineKeyboardButton(text="✅ Опубликовать розыгрыш ✅", callback_data=f"gedit|publish|{giveaway_id}")],
+    ]
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+def giveaway_publish(link: str) -> InlineKeyboardMarkup:
+    buttons = [
+        [types.InlineKeyboardButton(text="✅ Участвовать", url=link)],
     ]
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)

@@ -6,6 +6,7 @@ from keyboards import for_giveaway_edit, for_index
 from services import date, db
 from services.giveaway_text import generate_giveaway_text, generate_image_url
 from datetime import timedelta
+import base64
 
 router = Router(name=__name__)
 
@@ -24,7 +25,27 @@ async def _(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
     await open_giveaway(callback.message, giveaway_db)
 
+@router.callback_query(F.data.startswith("gedit|publish|"))
+async def _(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    giveaway_id = callback.data.split("|")[2]
+    giveaway_db = await db.get_giveaway(giveaway_id)
 
+    bot_me = await bot.get_me()
+    channels = []
+
+    for channel in giveaway_db['channels']:
+        data = base64.b64encode(f"{giveaway_id}|{channel['id']}".encode('utf-8')).decode('utf-8')
+        msg = await bot.send_photo(
+            chat_id=channel['id'],
+            photo=generate_image_url(giveaway_db),
+            caption=generate_giveaway_text(giveaway_db),
+            reply_markup=for_giveaway_edit.giveaway_publish(f'https://t.me/{bot_me.username}/app?startapp={data}')
+        )
+        channel['message_id'] = msg.message_id
+        channels.append(channel)
+
+    await db.update_giveaway(giveaway_id, {'channels': channels})
+    await callback.message.reply('Успешно!')
 
 @router.callback_query(F.data.startswith("gedit|channel|"))
 async def _(callback: CallbackQuery, state: FSMContext):
