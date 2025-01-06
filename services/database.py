@@ -83,10 +83,10 @@ class Database:
                 {
                     '$or': [
                         {'last_message_update': None},
-                        {'last_message_update': {'$lt': date.now_datetime() - timedelta(hours=5)}}
+                        {'last_message_update': {'$lt': date.datetime.now() - timedelta(hours=5)}}
                     ]
                 },
-                {'end_et': {'$lt': date.now_datetime()}}
+                {'end_et': {'$gt': date.datetime.now()}}
             ],
             'status': 'active'
         })]
