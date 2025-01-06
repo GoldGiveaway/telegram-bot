@@ -9,15 +9,18 @@ from datetime import datetime, timezone
 import logging
 
 async def winner_identification(giveaway: IGiveaway, bot: Bot):
-    winners = random.sample(giveaway.members, (len(giveaway.members) - giveaway.win_count) + giveaway.win_count)
+    wins = giveaway.win_count
+    if wins > len(giveaway.members):
+        wins = (len(giveaway.members) - giveaway.win_count) + giveaway.win_count
+    winners = random.sample(giveaway.members, wins)
 
     text = '<b>ИТОГИ РОЗЫГРЫША</b>\n'
     for id_, winner in enumerate(winners, start=1):
         user = await db.get_user(winner.id)
         if user.username:
-            text += f'\n<b>{id_}.</b> <a href="https://t.me/{user.username}">{user.first_name or ""} {user.last_name or ""}</a> <code>({user.user_id})</code>\n'
+            text += f'\n<b>{id_}.</b> <a href="https://t.me/{user.username}">{user.first_name or ""} {user.last_name or ""}</a> <code>({user.user_id})</code>'
         else:
-            text += f'\n<b>{id_}.</b> {user.first_name or ""} {user.last_name or ""} <code>({user.user_id})</code>\n'
+            text += f'\n<b>{id_}.</b> {user.first_name or ""} {user.last_name or ""} <code>({user.user_id})</code>'
 
     await db.update_giveaway(giveaway.giveaway_id, {'status': 'finalized', 'winners': [user.id for user in winners]})
 
