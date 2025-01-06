@@ -2,7 +2,7 @@ import logging
 import ujson as json
 import gRPC.giveaway_pb2
 import gRPC.giveaway_pb2_grpc
-from services import db
+from services import db, ObjectNotFound
 import base64
 import settings
 
@@ -19,8 +19,9 @@ class Greeter(giveaway_pb2_grpc.GreeterServicer):
         initData = json.loads(request.initData)
         user = json.loads(initData['user'])
 
-        db_user = await db.get_user(int(user['id']))
-        if not db_user:
+        try:
+            await db.get_user(int(user['id']))
+        except ObjectNotFound:
             await db.create_user(int(user['id']), user['username'], user['first_name'], user['last_name'])
 
         giveaway_id, chat_id = base64.b64decode(initData['start_param']).decode('utf-8').split('|', 2)

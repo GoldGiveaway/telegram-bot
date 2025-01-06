@@ -1,7 +1,7 @@
 from typing import Any, Awaitable, Callable, Optional
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, User
-from services import db
+from services import db, ObjectNotFound
 
 
 class UserDBMiddleware(BaseMiddleware):
@@ -13,8 +13,9 @@ class UserDBMiddleware(BaseMiddleware):
     ) -> Optional[Any]:
         user: Optional[User] = data.get("event_from_user")
         if user:
-            db_user = await db.get_user(user.id)
-            if not db_user:
+            try:
+                db_user = await db.get_user(user.id)
+            except ObjectNotFound:
                 db_user = await db.create_user(user.id, user.username, user.first_name, user.last_name)
             data["db_user"] = db_user
         return await handler(event, data)

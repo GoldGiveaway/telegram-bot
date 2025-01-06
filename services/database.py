@@ -4,6 +4,7 @@ from redis.asyncio import Redis
 from datetime import timedelta
 from services import date
 from interface.giveaway import IGiveaway, IMember
+from interface.user import IUser
 
 class ObjectNotFound(Exception):
     pass
@@ -23,7 +24,7 @@ class Database:
         self.users_collection = self.cluster.user
         self.giveaways_collection = self.cluster.giveaway
 
-    async def create_user(self, user_id: int, username: str, first_name: str, last_name: str) -> dict:
+    async def create_user(self, user_id: int, username: str, first_name: str, last_name: str) -> IUser:
         """
         Create a new user
 
@@ -31,18 +32,17 @@ class Database:
         :return:
         """
 
-        data = {
-            'user_id': user_id,
-            'created_at': date.now_datetime(),
-            'username': username,
-            'last_name': last_name,
-            'first_name': first_name,
-        }
+        data = IUser(
+            user_id=user_id,
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+        )
 
-        await self.users_collection.insert_one(data)
+        await self.users_collection.insert_one(data.model_dump())
         return data
 
-    async def get_user(self, user_id: int) -> dict:
+    async def get_user(self, user_id: int) -> IUser:
         """
         Get a user
 
@@ -50,9 +50,12 @@ class Database:
         :return:
         """
 
-        return await self.users_collection.find_one({'user_id': user_id})
+        data = await self.users_collection.find_one({'user_id': user_id})
+        if data:
+            return IUser(**data)
+        raise ObjectNotFound()
 
-    async def create_giveaway(self, title: str, date_end: date.datetime, owner_id: int):
+    async def create_giveaway(self, title: str, date_end: date.datetime, owner_id: int) -> IGiveaway:
         data = IGiveaway(
             end_et=date_end,
             title=title,
