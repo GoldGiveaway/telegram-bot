@@ -86,7 +86,7 @@ class Database:
                         {'last_message_update': {'$lt': datetime.now() - timedelta(hours=5)}}
                     ]
                 },
-                {'end_et': {'$gt': datetime.now()}}
+                {'end_et': {'$lt': datetime.now()}}
             ],
             'status': 'active'
         })]

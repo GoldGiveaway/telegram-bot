@@ -30,8 +30,10 @@ def generate_image_url(data: IGiveaway) -> str:
     else:
         if difference.seconds > 60 * 60:
             end_text = f'{int(difference.seconds / (60 * 60))} ч.'
-        else:
+        elif difference.seconds > 60:
             end_text = f'{int(difference.seconds / 60)} мин.'
+        else:
+            end_text = f'{int(difference.seconds)} сек.'
     data = {
         'title': data.title,
         'end': end_text,
