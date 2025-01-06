@@ -24,7 +24,13 @@ def generate_giveaway_text(data: IGiveaway) -> str:
 def generate_image_url(data: IGiveaway) -> str:
     # TODO: Фиксануть генерацию даты
     difference = data.end_et - date.datetime.now()
-    end_text = f'{difference.days} д.'
+    if difference.days != 0:
+        end_text = f'{difference.days} д.'
+    else:
+        if difference.seconds > 60 * 60:
+            end_text = f'{int(difference.seconds / 60 * 60)} ч.'
+        else:
+            end_text = f'{int(difference.seconds / 60)} мин.'
     data = {
         'title': data.title,
         'end': end_text,
