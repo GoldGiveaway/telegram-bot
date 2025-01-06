@@ -18,7 +18,7 @@ def generate_giveaway_text(data: IGiveaway) -> str:
     text += "\n\n<blockquote>" \
                  f"Участников: <b>{len(data.members)}</b>\n" \
                  f"Призовых мест: <b>{data.win_count}</b>\n" \
-                 f"Дата завершения: <b>{date.date_to_string(data.end_et)} по МСК</b>\n" \
+                 f"Дата завершения: <b>{date.date_to_string(data.end_et)}</b>\n" \
              "</blockquote>"
 
     return text

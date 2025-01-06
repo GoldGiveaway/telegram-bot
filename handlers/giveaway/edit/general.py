@@ -37,8 +37,7 @@ async def _(callback: CallbackQuery, state: FSMContext):
         case 'date':
             date_now = date.now_datetime()
             text = '<b>📝 Укажите дату завершения розыгрыша:</b>\n\n' \
-                f'<blockquote><b>❗️ ВНИМАНИЕ:</b> Бот работает по часовому поясу MSK (GMT+3). ' \
-                f'Актуальное время в боте: {date.date_to_string(date_now)}</blockquote>\n\n' \
+                f'<blockquote><b>❗️ ВНИМАНИЕ:</b> Актуальное время в боте: {date.date_to_string(date_now)}</blockquote>\n\n' \
                 f'<b>Пример:</b> {date.date_to_string(date_now + timedelta(days=1))}'
         case 'win':
             text = '<b>📝 Укажите количество победителей розыгрыша:</b>\n' \
