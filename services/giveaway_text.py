@@ -7,6 +7,7 @@ import urllib.parse
 
 settings = Settings()
 
+
 def generate_giveaway_text(data: IGiveaway) -> str:
     text = f'<b>{data.title}</b>'
 
@@ -22,7 +23,6 @@ def generate_giveaway_text(data: IGiveaway) -> str:
     return text
 
 def generate_image_url(data: IGiveaway) -> str:
-    # TODO: Фиксануть генерацию даты
     difference = data.end_et - date.datetime.now()
     if difference.days != 0:
         end_text = f'{difference.days} д.'

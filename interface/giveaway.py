@@ -1,7 +1,6 @@
 from typing import List, Optional, Literal
-from datetime import datetime
 from pydantic import BaseModel, Field
-from services import date
+from datetime import datetime
 import uuid
 
 class IChannel(BaseModel):
@@ -17,7 +16,7 @@ class IMember(BaseModel):
 
 class IGiveaway(BaseModel):
     giveaway_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    created_at: datetime = Field(default_factory=date.now_datetime)
+    created_at: datetime = Field(default_factory=datetime.now)
     end_et: datetime
     title: str
     owner_id: int
