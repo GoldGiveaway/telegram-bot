@@ -27,3 +27,4 @@ class IGiveaway(BaseModel):
     members: List[IMember] = Field(default_factory=list)
     last_message_update: Optional[datetime] = None
     status: Literal["active", "wait", "finalized"] = 'wait'
+    winners: Optional[List[int]] = Field(default_factory=list)

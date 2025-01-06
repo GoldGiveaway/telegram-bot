@@ -80,8 +80,13 @@ class Database:
     async def get_all_update_giveaways(self):
         return [item async for item in self.giveaways_collection.find({
             '$or': [
-                {'last_message_update': None},
-                {'last_message_update': {'$lt': date.now_datetime() - timedelta(hours=5)}},
+                {
+                    '$or': [
+                        {'last_message_update': None},
+                        {'last_message_update': {'$lt': date.now_datetime() - timedelta(hours=5)}}
+                    ]
+                },
+                {'end_et': {'$gt': date.now_datetime()}}
             ],
             'status': 'active'
         })]
