@@ -5,7 +5,7 @@ from aiogram.types import InputMediaPhoto
 from interface.giveaway import IGiveaway, IMember
 from services import db, giveaway_text, date
 from keyboards import for_giveaway_edit
-from datetime import datetime
+from datetime import datetime, UTC
 import logging
 
 async def winner_identification(giveaway: IGiveaway, bot: Bot):
@@ -77,6 +77,6 @@ async def update(bot: Bot):
             except:
                 logging.error(traceback.format_exc())
 
-        await db.update_giveaway(giveaway.giveaway_id, {'last_message_update': datetime.now()})
-        if date.datetime.now() > giveaway.end_et:
+        await db.update_giveaway(giveaway.giveaway_id, {'last_message_update': datetime.now(UTC)})
+        if datetime.now(UTC) > giveaway.end_et:
             await winner_identification(giveaway, bot)

@@ -3,6 +3,7 @@ import base64
 from interface.giveaway import IGiveaway
 from services import date
 from settings import Settings
+from datetime import datetime, UTC
 import urllib.parse
 
 settings = Settings()
@@ -23,7 +24,7 @@ def generate_giveaway_text(data: IGiveaway) -> str:
     return text
 
 def generate_image_url(data: IGiveaway) -> str:
-    difference = data.end_et - date.datetime.now()
+    difference = data.end_et - datetime.now(UTC)
     if difference.days != 0:
         end_text = f'{difference.days} д.'
     else:
