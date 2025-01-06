@@ -33,7 +33,7 @@ def giveaway_publish(link: str) -> InlineKeyboardMarkup:
     buttons = [
         [types.InlineKeyboardButton(text="✅ Участвовать", url=link)],
         [types.InlineKeyboardButton(text="🔗 Поделиться",
-                                    url=f'https://t.me/share/url?{urllib.parse.urlencode(share_data)}')]
+                                    url=f'https://t.me/share/url?{urllib.parse.urlencode(share_data).replace("+", "%20")}')]
     ]
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)

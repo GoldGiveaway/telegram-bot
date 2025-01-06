@@ -43,7 +43,7 @@ async def _(callback: CallbackQuery, state: FSMContext, bot: Bot):
 
     for channel in giveaway_db.channels:
         channel.message_id = await send_giveaway(channel.id, giveaway_db, bot)
-        channels.append(channel)
+        channels.append(channel.model_dump())
 
     await db.update_giveaway(giveaway_id, {'channels': channels, 'last_message_update': None, 'status': 'active'})
     await callback.message.reply('Успешно!')

@@ -20,13 +20,13 @@ async def _(callback: CallbackQuery, state: FSMContext):
     await callback.message.reply('<b>📢 Нажмите кнопку ниже что-бы подключить канал</b>',
                                  reply_markup=for_giveaway_edit.add_channel())
 
-async def add_chat(channel, bot: Bot, giveaway_db: IGiveaway):
+async def add_chat(channel, bot: Bot, giveaway_db: IGiveaway, channel_id: int):
     photo_id = None
     if channel.photo:
         photo_id = channel.photo[0].file_id
-    link = await bot.create_chat_invite_link(channel.id)
+    link = await bot.create_chat_invite_link(channel_id)
     giveaway_db.channels.append(
-        IChannel(id=channel.id, message_id=None, link=link.invite_link, name=channel.title, photo=photo_id)
+        IChannel(id=channel_id, message_id=None, link=link.invite_link, name=channel.title, photo=photo_id)
     )
     await db.update_giveaway(giveaway_db.giveaway_id, giveaway_db.model_dump())
 
@@ -45,7 +45,7 @@ async def my_chat_member_handler(my_chat_member: ChatMemberUpdated, dispatcher: 
             giveaway_db = await db.get_giveaway(data['giveaway_id'])
             await fsm.clear()
 
-            await add_chat(channel, bot, giveaway_db)
+            await add_chat(channel, bot, giveaway_db, channel.id)
             message = await bot.send_message(my_chat_member.from_user.id,
                                    f'<b>Канал {channel.title} успешно добавлен!</b>',
                                    reply_markup=for_index.clear_keyboard()
@@ -63,6 +63,6 @@ async def _(message: Message, state: FSMContext, bot: Bot):
     if channel.chat_id in [channel.id for channel in giveaway_db.channels]:
         await message.answer('<b>Этот канал уже был добавлен!</b>', reply_markup=for_index.clear_keyboard())
     else:
-        await add_chat(channel, bot, giveaway_db)
+        await add_chat(channel, bot, giveaway_db, channel.chat_id)
         await message.answer('<b>Канал успешно добавлен!</b>', reply_markup=for_index.clear_keyboard())
     await open_giveaway(message, giveaway_db)

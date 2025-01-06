@@ -78,7 +78,7 @@ class Database:
         return [item async for item in self.giveaways_collection.find({'owner_id': user_id})]
 
     async def get_all_update_giveaways(self):
-        return [item async for item in self.giveaways_collection.find({
+        return [IGiveaway(**data) async for data in self.giveaways_collection.find({
             '$or': [
                 {
                     '$or': [
@@ -86,7 +86,7 @@ class Database:
                         {'last_message_update': {'$lt': date.now_datetime() - timedelta(hours=5)}}
                     ]
                 },
-                {'end_et': {'$gt': date.now_datetime()}}
+                {'end_et': {'$lt': date.now_datetime()}}
             ],
             'status': 'active'
         })]

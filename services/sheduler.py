@@ -20,7 +20,7 @@ async def winner_identification(giveaway: IGiveaway, bot: Bot):
 
     await db.update_giveaway(giveaway.giveaway_id, {'status': 'finalized', 'winners': winners})
 
-    for channel in giveaway['channels']:
+    for channel in giveaway.channels:
         try:
             await bot.send_message(
                 chat_id=channel.id,
@@ -77,5 +77,5 @@ async def update(bot: Bot):
                 logging.error(traceback.format_exc())
 
         await db.update_giveaway(giveaway.giveaway_id, {'last_message_update': date.now_datetime()})
-        if date.now_datetime() > giveaway.end_et:
+        if date.datetime.now() > giveaway.end_et:
             await winner_identification(giveaway, bot)
