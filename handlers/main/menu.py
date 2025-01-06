@@ -1,5 +1,4 @@
 from aiogram import Router, F
-from aiogram.enums import ContentType
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
@@ -7,6 +6,7 @@ from keyboards import for_index
 from services import db
 
 router = Router(name=__name__)
+
 
 @router.message(Command("start"))
 async def cmd_start(message: Message, state: FSMContext):
@@ -22,6 +22,7 @@ async def cmd_start(message: Message, state: FSMContext):
         reply_markup=for_index.menu()
     )
 
+
 @router.callback_query(F.data == "menu")
 async def _(callback: CallbackQuery, state: FSMContext):
     """Go menu"""
@@ -31,7 +32,9 @@ async def _(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == "giveaway|list")
-async def _(callback: CallbackQuery, state: FSMContext):
+async def _(callback: CallbackQuery):
+    """Giveaway list menu"""
+
     giveaways = await db.get_all_giveaways_user(callback.from_user.id)
     await callback.message.delete()
     await callback.message.answer_photo(
@@ -39,4 +42,3 @@ async def _(callback: CallbackQuery, state: FSMContext):
         caption='<b>🎁 Список ваших розыгрышей:</b>',
         reply_markup=for_index.giveaway_list(giveaways)
     )
-

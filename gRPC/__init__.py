@@ -13,7 +13,7 @@ class Greeter(giveaway_pb2_grpc.GreeterServicer):
         initData = json.loads(request.initData)
         giveaway_id, chat_id = base64.b64decode(initData['start_param']).decode('utf-8').split('|', 2)
         giveaway_db = await db.get_giveaway(giveaway_id)
-        return giveaway_pb2.GiveawayReply(json_message=json.dumps({'channels': giveaway_db['channels']}))
+        return giveaway_pb2.GiveawayReply(json_message=json.dumps({'channels': giveaway_db.channels}))
 
     async def ParticipatingGiveaway(self, request, context):
         initData = json.loads(request.initData)

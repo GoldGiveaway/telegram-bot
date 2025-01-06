@@ -6,8 +6,8 @@ from keyboards import for_index
 from services import date, db
 from datetime import timedelta
 
-
 router = Router(name=__name__)
+
 
 @router.callback_query(F.data == "giveaway|create")
 async def _(callback: CallbackQuery, state: FSMContext):
@@ -20,7 +20,6 @@ async def _(callback: CallbackQuery, state: FSMContext):
                 '<b>Пример:</b> iPhone 15',
         reply_markup=for_index.go_home()
     )
-
 
 
 @router.message(GiveawayCreate.title)
@@ -47,6 +46,7 @@ async def _(message: Message, state: FSMContext):
                 f'<b>Пример:</b> {date.date_to_string(date_now + timedelta(days=1))}',
         reply_markup=for_index.go_home()
     )
+
 
 @router.message(GiveawayCreate.date)
 async def _(message: Message, state: FSMContext):

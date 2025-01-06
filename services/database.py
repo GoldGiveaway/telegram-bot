@@ -1,10 +1,13 @@
-import uuid
-
 import motor.motor_asyncio
 from settings import Settings
 from redis.asyncio import Redis
 from datetime import timedelta
 from services import date
+from interface.giveaway import IGiveaway, IMember
+
+class ObjectNotFound(Exception):
+    pass
+
 
 settings = Settings()
 redis = Redis(
@@ -50,28 +53,20 @@ class Database:
         return await self.users_collection.find_one({'user_id': user_id})
 
     async def create_giveaway(self, title: str, date_end: date.datetime, owner_id: int):
-        data = {
-            'giveaway_id': str(uuid.uuid4()),
-            'created_at': date.now_datetime(),
-            'end_et': date_end,
-            'title': title,
-            'owner_id': owner_id,
-            'description': '',
-            'win_count': 1,
-            # 'channels': [{'id': 123, 'message_id': 123, 'link': 'https://t.me/....', 'name': 'Супер канал', 'photo': ''}],
-            'channels': [],
-            # 'members': [{'id': 123, 'date': DATE}]
-            'members': [],
-            'last_message_update': None,
-            # active / wait / finalized
-            'status': 'wait'
-        }
+        data = IGiveaway(
+            end_et=date_end,
+            title=title,
+            owner_id=owner_id,
+        )
 
-        await self.giveaways_collection.insert_one(data)
+        await self.giveaways_collection.insert_one(data.model_dump())
         return data
 
-    async def get_giveaway(self, giveaway_id: str) -> dict:
-        return await self.giveaways_collection.find_one({'giveaway_id': giveaway_id})
+    async def get_giveaway(self, giveaway_id: str) -> IGiveaway:
+        data = await self.giveaways_collection.find_one({'giveaway_id': giveaway_id})
+        if data:
+            return IGiveaway(**data)
+        raise ObjectNotFound()
 
     async def update_giveaway(self, giveaway_id: str, js: dict):
         await self.giveaways_collection.update_one({'giveaway_id': giveaway_id}, {'$set': js})
@@ -90,14 +85,11 @@ class Database:
 
     async def giveaway_participating(self, user_id: int, giveaway_id: str) -> bool:
         giveaway_db = await self.get_giveaway(giveaway_id)
-        if user_id in [member['id'] for member in giveaway_db['members']]:
+        if user_id in [member.id for member in giveaway_db.members]:
             return False
-        giveaway_db['members'].append({
-            'id': user_id,
-            'date': date.now_datetime(),
-        })
-        await self.update_giveaway(giveaway_id, giveaway_db)
-        await db.update_giveaway(giveaway_id, {'last_message_update': None})
+        giveaway_db.members.append(IMember(id=user_id, date=date.now_datetime()))
+        giveaway_db.last_message_update = None
+        await self.update_giveaway(giveaway_id, giveaway_db.model_dump())
         return True
 
 db = Database(settings.mongodb_url.get_secret_value())
