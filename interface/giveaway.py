@@ -1,6 +1,6 @@
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 import uuid
 
 class IChannel(BaseModel):
@@ -16,7 +16,7 @@ class IMember(BaseModel):
 
 class IGiveaway(BaseModel):
     giveaway_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     end_et: datetime
     title: str
     owner_id: int

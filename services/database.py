@@ -1,7 +1,7 @@
 import motor.motor_asyncio
 from settings import Settings
 from redis.asyncio import Redis
-from datetime import timedelta, datetime, UTC
+from datetime import timedelta, datetime, timezone
 from services import date
 from interface.giveaway import IGiveaway, IMember
 from interface.user import IUser
@@ -83,10 +83,10 @@ class Database:
                 {
                     '$or': [
                         {'last_message_update': None},
-                        {'last_message_update': {'$lt': datetime.now(UTC) - timedelta(hours=5)}}
+                        {'last_message_update': {'$lt': datetime.now(timezone.utc) - timedelta(hours=5)}}
                     ]
                 },
-                {'end_et': {'$gt': datetime.now(UTC)}}
+                {'end_et': {'$gt': datetime.now(timezone.utc)}}
             ],
             'status': 'active'
         })]
@@ -95,7 +95,7 @@ class Database:
         giveaway_db = await self.get_giveaway(giveaway_id)
         if user_id in [member.id for member in giveaway_db.members]:
             return False
-        giveaway_db.members.append(IMember(id=user_id, date=datetime.now(UTC)))
+        giveaway_db.members.append(IMember(id=user_id, date=datetime.now(timezone.utc)))
         giveaway_db.last_message_update = None
         await self.update_giveaway(giveaway_id, giveaway_db.model_dump())
         return True
