@@ -1,15 +1,13 @@
 from aiogram import Router, F
-from aiogram.enums import ContentType
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
-from aiogram.fsm.context import FSMContext
-from keyboards import for_index
 from services import db
 
 router = Router(name=__name__)
 
+
 @router.message(Command("admin"))
-async def _(message: Message, state: FSMContext):
+async def _(message: Message):
     await message.answer(
         f'🫂 Пользователей: <b>{await db.users_collection.count_documents({})}</b>\n\n'
         f'🎁 Розыгрышей:\n'

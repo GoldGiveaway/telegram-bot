@@ -9,4 +9,3 @@ class IUser(BaseModel):
     username: Optional[str]
     last_name: Optional[str]
     first_name: Optional[str]
-

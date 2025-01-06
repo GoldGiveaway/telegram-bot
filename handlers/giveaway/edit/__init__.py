@@ -4,7 +4,7 @@ from . import general, channel, publish
 from aiogram import Router, F
 
 router = Router(name=__name__)
-router.include_routers(general.router, channel.router, publish.router)
+router.include_routers(channel.router, publish.router, general.router)
 
 @router.callback_query(F.data.startswith("giveaway|edit|"))
 async def _(callback: CallbackQuery):
