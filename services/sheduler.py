@@ -19,7 +19,7 @@ async def winner_identification(giveaway: IGiveaway, bot: Bot):
         else:
             text += f'\n<b>{id_}.</b> {user.first_name or ""} {user.last_name or ""} <code>({user.user_id})</code>\n'
 
-    await db.update_giveaway(giveaway.giveaway_id, {'status': 'finalized', 'winners': winners})
+    await db.update_giveaway(giveaway.giveaway_id, {'status': 'finalized', 'winners': [user.id for user in winners]})
 
     for channel in giveaway.channels:
         try:
