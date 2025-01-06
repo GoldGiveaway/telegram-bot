@@ -77,6 +77,6 @@ async def update(bot: Bot):
             except:
                 logging.error(traceback.format_exc())
 
-        await db.update_giveaway(giveaway.giveaway_id, {'last_message_update': datetime.now(timezone.utc)})
-        if datetime.now(timezone.utc) > giveaway.end_et:
+        await db.update_giveaway(giveaway.giveaway_id, {'last_message_update': datetime.now()})
+        if datetime.now() > giveaway.end_et:
             await winner_identification(giveaway, bot)

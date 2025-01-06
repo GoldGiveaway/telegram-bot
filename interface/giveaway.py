@@ -16,7 +16,7 @@ class IMember(BaseModel):
 
 class IGiveaway(BaseModel):
     giveaway_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now())
     end_et: datetime
     title: str
     owner_id: int

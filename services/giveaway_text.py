@@ -24,7 +24,7 @@ def generate_giveaway_text(data: IGiveaway) -> str:
     return text
 
 def generate_image_url(data: IGiveaway) -> str:
-    difference = data.end_et - datetime.now(timezone.utc)
+    difference = data.end_et - datetime.now()
     if difference.days != 0:
         end_text = f'{difference.days} д.'
     else:
