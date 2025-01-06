@@ -1,7 +1,7 @@
 import motor.motor_asyncio
 from settings import Settings
 from redis.asyncio import Redis
-from datetime import timedelta
+from datetime import timedelta, datetime
 from services import date
 from interface.giveaway import IGiveaway, IMember
 from interface.user import IUser
@@ -95,7 +95,7 @@ class Database:
         giveaway_db = await self.get_giveaway(giveaway_id)
         if user_id in [member.id for member in giveaway_db.members]:
             return False
-        giveaway_db.members.append(IMember(id=user_id, date=date.now_datetime()))
+        giveaway_db.members.append(IMember(id=user_id, date=datetime.now()))
         giveaway_db.last_message_update = None
         await self.update_giveaway(giveaway_id, giveaway_db.model_dump())
         return True
